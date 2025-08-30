@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>靚靚認水果動物遊戲 🍎🐶</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2&display=swap');
+
+body {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-family:'Baloo 2', cursive;
+  background: #fff8e7;
+  color:#333;
+  height:100vh;
+  margin:0;
+}
+
+h1 { 
+  font-size:3em; 
+  margin-bottom:20px; 
+  color:#ff6f91;
+  text-align:center;
+}
+
+button {
+  font-size:2em;
+  padding:15px 30px;
+  border-radius:25px;
+  border:none;
+  background:#ffdd99;
+  cursor:pointer;
+  margin:5px;
+  transition:0.1s;
+}
+button:hover { transform: scale(1.05); background:#ffd066; }
+button:active { transform: scale(1.1); background:#ffc633; }
+
+#startBtn { background: linear-gradient(45deg,#ffb347,#ffcc33); }
+
+#game { display:none; flex-direction:column; align-items:center; }
+
+#items { font-size:5em; margin-bottom:20px; }
+
+#question { font-size:2.5em; margin:20px; text-align:center; }
+
+button.choiceBtn { font-size:2em; padding:20px 30px; border-radius:25px; margin:5px; }
+
+#feedback { font-size:2em; margin-top:20px; height:50px; text-align:center; }
+</style>
+</head>
+<body>
+
+<h1>靚靚認水果與動物 🍎🐶</h1>
+<button id="startBtn">開始遊戲 🎮</button>
+
+<div id="game">
+  <div id="items"></div>
+  <div id="question"></div>
+  <div id="choices"></div>
+  <div id="feedback"></div>
+  <div>
+    <button id="nextBtn">下一題 ➡️</button>
+    <button id="endBtn">結束 ❌</button>
+  </div>
+</div>
+
+<script>
+const startBtn = document.getElementById('startBtn');
+const gameEl = document.getElementById('game');
+const itemsEl = document.getElementById('items');
+const questionEl = document.getElementById('question');
+const choicesEl = document.getElementById('choices');
+const feedbackEl = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const endBtn = document.getElementById('endBtn');
+
+const pool = [
+  {emoji:"🍎", zh:"ㄆㄧㄥˊ ㄍㄨㄛˇ"},
+  {emoji:"🍌", zh:"ㄒㄧㄤ ㄐㄧㄠ"},
+  {emoji:"🍇", zh:"ㄆㄨˊ ㄊㄠˊ"},
+  {emoji:"🍓", zh:"ㄘㄠˇ ㄇㄟˊ"},
+  {emoji:"🐶", zh:"ㄍㄡˇ ㄍㄡˇ"},
+  {emoji:"🐱", zh:"ㄇㄠ ㄇㄠ"},
+  {emoji:"🐰", zh:"ㄊㄨˋ ㄗ˙"},
+  {emoji:"🐷", zh:"ㄓㄨ"},
+  {emoji:"🦒", zh:"ㄔㄤˊ ㄐㄧㄥˇ ㄌㄨˋ"}
+];
+
+let currentItem, currentCount;
+
+// 開始遊戲
+startBtn.addEventListener('click', ()=>{
+  startBtn.style.display = 'none';
+  gameEl.style.display = 'flex';
+  newQuestion();
+});
+
+// 下一題按鈕
+nextBtn.addEventListener('click', ()=>newQuestion());
+
+// 結束遊戲按鈕
+endBtn.addEventListener('click', ()=>{
+  gameEl.style.display = 'none';
+  startBtn.style.display = 'inline-block';
+  feedbackEl.textContent = "";
+});
+
+// 生成新題目
+function newQuestion(){
+  feedbackEl.textContent = "";
+  choicesEl.innerHTML = "";
+
+  currentItem = pool[Math.floor(Math.random()*pool.length)];
+  currentCount = Math.floor(Math.random()*3)+1;
+
+  let display = "";
+  for(let i=0;i<currentCount;i++){
+    display += currentItem.emoji + " ";
+  }
+  display += "<br>" + currentItem.zh;
+  itemsEl.innerHTML = display;
+
+  questionEl.textContent = `請問有幾個 ${currentItem.emoji}？`;
+
+  // 三個不重複選項
+  let options = new Set();
+  options.add(currentCount);
+  while(options.size < 3){
+    let delta = Math.floor(Math.random()*4) - 2;
+    if(delta===0) continue;
+    let opt = currentCount + delta;
+    if(opt < 1) opt = 1;
+    options.add(opt);
+  }
+
+  options = Array.from(options);
+  options.sort(()=>Math.random()-0.5);
+
+  options.forEach(opt=>{
+    const btn = document.createElement('button');
+    btn.textContent = opt + " 🎈";
+    btn.className = 'choiceBtn';
+    btn.addEventListener('click', ()=>checkAnswer(opt));
+    choicesEl.appendChild(btn);
+  });
+}
+
+// 檢查答案
+function checkAnswer(selected){
+  if(selected===currentCount){
+    feedbackEl.textContent = "🎉 好棒！答對了！";
+    feedbackEl.style.color = "green";
+  } else {
+    feedbackEl.textContent = "😅 再試一次";
+    feedbackEl.style.color = "red";
+  }
+}
+</script>
+
+</body>
+</html>
